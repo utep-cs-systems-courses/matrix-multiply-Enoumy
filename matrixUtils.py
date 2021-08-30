@@ -2,23 +2,23 @@
 import argparse
 import numpy as np
 
+
 def genMatrix(size=1024, value=1):
     """
     Generates a 2d square matrix of the specified size with the specified values
     """
 
-    matrix = [[value for col in range(0,size)] for row in range(0,size)]
+    return [[value for col in range(size)] for row in range(size)]
 
-    return matrix
 
 def genMatrix2(size=1024, value=1):
     """
     Generates a 2d square matrix of the specified size with the specified values
     """
 
-    matrix = np.asarray([ np.asarray([value for col in range(0,size)]) for row in range(0,size)])
+    return np.asarray([np.asarray([value for col in range(size)])
+                       for row in range(size)])
 
-    return matrix
 
 def printSubarray(matrix, size=10):
     """
@@ -26,10 +26,11 @@ def printSubarray(matrix, size=10):
     the matrix
     """
 
-    for row in range(1, 10):
-        for col in range(1, 10):
-            print(f'{matrix[row][col]} ' , end='')
+    for row in range(min(size, len(matrix))):
+        for col in range(min(size, len(matrix[0]))):
+            print(f'{matrix[row][col]}', end=' ')
         print('')
+
 
 def writeToFile(matrix, fileName):
     """
@@ -41,6 +42,7 @@ def writeToFile(matrix, fileName):
             for col in row:
                 file.write(f'{col} ')
             file.write('\n')
+
 
 def readFromFile(fileName):
     """
@@ -56,19 +58,20 @@ def readFromFile(fileName):
 
     return matrix
 
+
 def main():
     """
     Used for running as a script
     """
 
-    parser = argparse.ArgumentParser(description=
-        'Generate a 2d matrix and save it to  a file.')
+    parser = argparse.ArgumentParser(
+        description='Generate a 2d matrix and save it to  a file.')
     parser.add_argument('-s', '--size', default=1024, type=int,
-        help='Size of the 2d matrix to generate')
+                        help='Size of the 2d matrix to generate')
     parser.add_argument('-v', '--value', default=1, type=int,
-        help='The value with which to fill the array with')
+                        help='The value with which to fill the array with')
     parser.add_argument('-f', '--filename',
-        help='The name of the file to save the matrix in (optional)')
+                        help='The name of the file to save the matrix in (optional)')
 
     args = parser.parse_args()
 
@@ -82,6 +85,7 @@ def main():
         printSubarray(readFromFile(args.filename))
     else:
         printSubarray(mat)
+
 
 if __name__ == '__main__':
     # execute only if run as a script
