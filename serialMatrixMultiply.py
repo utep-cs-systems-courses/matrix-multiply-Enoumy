@@ -136,8 +136,7 @@ def main():
 
     if args.test:
         [t() for t in tests]
-        return 
-
+        return
 
     if args.example:
         matrix = matrixUtils.genMatrix(size=500)
@@ -158,16 +157,15 @@ def main():
     print('Matrix B (cropped):')
     matrixUtils.printSubarray(matrix2, size=args.show_size)
 
-    start = time.clock_getttime(time.CLOCK_MONOTONIC)
+    start = time.clock_gettime(time.CLOCK_MONOTONIC)
     resulting_matrix = matrixMultiply(matrix1, matrix2)
-    time_taken = time.clock_getttime(time.CLOCK_MONOTONIC) - start
+    time_taken = time.clock_gettime(time.CLOCK_MONOTONIC) - start
 
+    print('A x B (cropped):')
+    print(f'Time taken: {time_taken} seconds')
+    matrixUtils.printSubarray(resulting_matrix, size=args.show_size)
 
-print('A x B (cropped):')
-print(f'Time taken: {time_taken} seconds')
-matrixUtils.printSubarray(resulting_matrix, size=args.show_size)
-
-matrixUtils.writeToFile(resulting_matrix, args.output)
+    matrixUtils.writeToFile(resulting_matrix, args.output)
 
 
 if __name__ == '__main__':
