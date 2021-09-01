@@ -1,27 +1,47 @@
 """
-Parallel Computing Assignment 1 - Jose Rodriguez
+# Parallel Computing Assignment 1 - Jose Rodriguez
 
 For full instructions on how to run do:
 
-    ```
-    $ python3 serialMatrixMultiply --help 
-    ```
+```sh
+$ python3 serialMatrixMultiply --help 
+```
 
 but the tldr, is that if you want to run it by reading two files from different
 matrices do:
 
+```sh
     $ ... --file1 a.txt --file2 b.txt
+```
 
 for two matrices of n size do:
-    $ ... --size 100
 
+```sh
+$ ... --size 100
+```
 
 to run small functional tests do:
-    $ ... --test true
 
+```sh
+$ ... --test true
+```
 
 output matrix is put inside of output.txt, but can be changed with the
 --output flag.
+
+
+You can generate test input files through the following commands:
+
+```sh
+$ python3 serialMatrixMultiply.py --example true
+```
+
+
+After generating the input files, you can run:
+
+```sh
+$ python3 serialMatrixMultiply.py --file1 a.txt --file2 b.txt
+```
 """
 
 
@@ -109,11 +129,21 @@ def main():
                         help='If present, runs tests')
     parser.add_argument('--show_size', default=10, type=int,
                         help='Maximum matrix size to print (rest is ignored) (Whole matrix is saved to file).')
+    parser.add_argument('--example', default=False, type=bool,
+                        help='If set to true, program will only generate test data into a.txt and b.txt')
 
     args = parser.parse_args()
 
     if args.test:
         [t() for t in tests]
+        return 
+
+
+    if args.example:
+        matrix = matrixUtils.genMatrix(size=500)
+        matrixUtils.writeToFile(matrix, 'a.txt')
+        matrixUtils.writeToFile(matrix, 'b.txt')
+        return
 
     if args.file1 and args.file2:
         matrix1 = matrixUtils.readFromFile(args.file1)
