@@ -55,3 +55,14 @@ or
 
 $ source run.sh
 ```
+
+## Blocked matrix multiply extension.
+
+The first extension to the matrix multiply algorithm was adding a blocked
+version of the algorithm in which there are smaller subsections for each
+matrix. There are now "blocks". The behavior ended up being the same in regards
+to the output outputted by the program, but after timing both versions,
+on a size of 400, the blocked version took around twice as much.
+
+This makes sense due to the extra overhead of the extra loops, and the irregular
+array accesses.
