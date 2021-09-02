@@ -68,6 +68,32 @@ def matrixMultiply(matrix_a, matrix_b):
     return out
 
 
+def blockedMatrixMultiply(matrix_a, matrix_b):
+    """
+    Returns a the matrix multiplication of two matrices.
+    The first matrix is the left matrix and the second parameter matrix is the
+    right matrix.
+    """
+    assert len(matrix_a[0]) == len(matrix_b), 'Both matrices can be multiplied'
+
+    out = [[0 for _ in range(len(matrix_b[0]))] for _ in range(len(matrix_a))]
+
+    tile_size = 16
+
+    for row in range(0, len(out), tile_size):
+        for col in range(0, len(out[0]), tile_size):
+            for i in range(len(matrix_b)):
+                j_end_val = col + tile_size
+                for j in range(col, min(j_end_val, len(matrix_a[0]))):
+                    k_end_val = row + tile_size
+                    curr_sum = out[i][j]
+                    for k in range(row, min(k_end_val, len(matrix_b))):
+                        curr_sum += matrix_a[i][k] * matrix_b[k][j]
+                    out[i][j] = curr_sum
+
+    return out
+
+
 def identityMatrixTest():
     a = [[1, 2, 3],
          [4, 5, 6],
@@ -77,7 +103,8 @@ def identityMatrixTest():
            [4, 5, 6],
            [7, 8, 9]]
 
-    assert matrixMultiply(a, b) == out, 'identity matrix test'
+    for f in [matrixMultiply, blockedMatrixMultiply]:
+        assert f(a, b) == out, 'identity matrix test'
     print('identity test passed!')
 
 
@@ -92,7 +119,8 @@ def squareMatricTest():
            [201, 216, 231],
            [318, 342, 366]]
 
-    assert matrixMultiply(a, b) == out, 'square matrix test'
+    for f in [matrixMultiply, blockedMatrixMultiply]:
+        assert f(a, b) == out, 'square matrix test'
     print('square matrix test passed!')
 
 
@@ -105,7 +133,8 @@ def differentShapesTest():
     out = [[58, 64],
            [139, 154]]
 
-    assert matrixMultiply(a, b) == out, 'different shapes test'
+    for f in [matrixMultiply, blockedMatrixMultiply]:
+        assert matrixMultiply(a, b) == out, 'different shapes test'
     print('different shapes test passsed!')
 
 
@@ -164,6 +193,14 @@ def main():
     print('A x B (cropped):')
     print(f'Time taken: {time_taken} seconds')
     matrixUtils.printSubarray(resulting_matrix, size=args.show_size)
+
+    start = time.clock_gettime(time.CLOCK_MONOTONIC)
+    resulting_blocked_matrix = blockedMatrixMultiply(matrix1, matrix2)
+    time_taken = time.clock_gettime(time.CLOCK_MONOTONIC) - start
+
+    print('A x B through blocked matrix multiply (cropped):')
+    print(f'Time taken: {time_taken} seconds')
+    matrixUtils.printSubarray(resulting_blocked_matrix, size=args.show_size)
 
     matrixUtils.writeToFile(resulting_matrix, args.output)
 
