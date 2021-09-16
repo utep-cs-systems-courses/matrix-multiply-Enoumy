@@ -1,1 +1,1 @@
-python3 serialMatrixMultiply.py --size 400
+python3 serialMatrixMultiply.py --size 500
