@@ -48,6 +48,7 @@ $ python3 serialMatrixMultiply.py --file1 a.txt --file2 b.txt
 import argparse
 import matrixUtils
 import time
+import pymp
 
 
 def matrixMultiply(matrix_a, matrix_b):
@@ -94,6 +95,30 @@ def blockedMatrixMultiply(matrix_a, matrix_b):
     return out
 
 
+def matrixMultiplyParallelRow(matrix_a, matrix_b):
+    """
+    Returns a the matrix multiplication of two matrices.
+    The first matrix is the left matrix and the second parameter matrix is the
+    right matrix.
+    """
+    assert len(matrix_a[0]) == len(matrix_b), 'Both matrices can be multiplied'
+
+    out = pymp.shared.list([pymp.shared.list(
+        [0 for _ in range(len(matrix_b[0]))]) for _ in range(len(matrix_a))])
+
+    with pymp.Parallel() as p:
+        for row in p.range(0, len(out)):
+            for col in range(len(out[0])):
+                out[row][col] = sum(matrix_a[row][i] * matrix_b[i][col]
+                                    for i in range(len(matrix_b)))
+
+    return [list(l) for l in out]
+
+
+matrix_functions = [matrixMultiply,
+                    blockedMatrixMultiply, matrixMultiplyParallelRow]
+
+
 def identityMatrixTest():
     a = [[1, 2, 3],
          [4, 5, 6],
@@ -103,7 +128,7 @@ def identityMatrixTest():
            [4, 5, 6],
            [7, 8, 9]]
 
-    for f in [matrixMultiply, blockedMatrixMultiply]:
+    for f in matrix_functions:
         assert f(a, b) == out, 'identity matrix test'
     print('identity test passed!')
 
@@ -119,7 +144,7 @@ def squareMatricTest():
            [201, 216, 231],
            [318, 342, 366]]
 
-    for f in [matrixMultiply, blockedMatrixMultiply]:
+    for f in matrix_functions:
         assert f(a, b) == out, 'square matrix test'
     print('square matrix test passed!')
 
@@ -133,7 +158,7 @@ def differentShapesTest():
     out = [[58, 64],
            [139, 154]]
 
-    for f in [matrixMultiply, blockedMatrixMultiply]:
+    for f in matrix_functions:
         assert matrixMultiply(a, b) == out, 'different shapes test'
     print('different shapes test passsed!')
 
@@ -201,6 +226,14 @@ def main():
     print('A x B through blocked matrix multiply (cropped):')
     print(f'Time taken: {time_taken} seconds')
     matrixUtils.printSubarray(resulting_blocked_matrix, size=args.show_size)
+
+    start = time.clock_gettime(time.CLOCK_MONOTONIC)
+    resulting_parallel_matrix = matrixMultiplyParallelRow(matrix1, matrix2)
+    time_taken = time.clock_gettime(time.CLOCK_MONOTONIC) - start
+
+    print('A x B through row parallel matrix multiply (cropped):')
+    print(f'Time taken: {time_taken} seconds')
+    matrixUtils.printSubarray(resulting_parallel_matrix, size=args.show_size)
 
     matrixUtils.writeToFile(resulting_matrix, args.output)
 
