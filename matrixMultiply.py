@@ -4,7 +4,7 @@
 For full instructions on how to run do:
 
 ```sh
-$ python3 serialMatrixMultiply --help 
+$ python3 matrixMultiply.py --help
 ```
 
 but the tldr, is that if you want to run it by reading two files from different
@@ -33,14 +33,14 @@ output matrix is put inside of output.txt, but can be changed with the
 You can generate test input files through the following commands:
 
 ```sh
-$ python3 serialMatrixMultiply.py --example true
+$ python3 matrixMultiply.py --example true
 ```
 
 
 After generating the input files, you can run:
 
 ```sh
-$ python3 serialMatrixMultiply.py --file1 a.txt --file2 b.txt
+$ python3 matrixMultiply.py --file1 a.txt --file2 b.txt
 ```
 """
 
@@ -103,16 +103,17 @@ def matrixMultiplyParallelRow(matrix_a, matrix_b):
     """
     assert len(matrix_a[0]) == len(matrix_b), 'Both matrices can be multiplied'
 
-    out = pymp.shared.list([pymp.shared.list(
-        [0 for _ in range(len(matrix_b[0]))]) for _ in range(len(matrix_a))])
+    out = pymp.shared.array((len(matrix_a), len(matrix_b[0])), dtype="uint32")
 
     with pymp.Parallel() as p:
+        print(f'Number of thread: {p.thread_num} of {p.num_threads}')
+
         for row in p.range(0, len(out)):
             for col in range(len(out[0])):
                 out[row][col] = sum(matrix_a[row][i] * matrix_b[i][col]
                                     for i in range(len(matrix_b)))
 
-    return [list(l) for l in out]
+    return list(list(l) for l in out)
 
 
 matrix_functions = [matrixMultiply,
